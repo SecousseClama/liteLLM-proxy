@@ -6,6 +6,8 @@
 # Ignore venv
 venv/
 
+request_logs.json
+
 # Ignore pipenv
 Pipfile
 Pipfile.lock
