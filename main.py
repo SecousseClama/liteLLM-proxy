@@ -4,7 +4,6 @@ from flask_cors import CORS
 import traceback
 import litellm
 import threading
-from litellm import completion 
 import os, dotenv, time 
 import json
 dotenv.load_dotenv()
@@ -35,10 +34,8 @@ def api_completion():
     try:
         # COMPLETION CALL
         print(f"data: {data}")
-        response = completion(**data)
+        response = litellm.completion(**data)
         print(f"Got Response: {response}")
-        ## LOG SUCCESS
-        end_time = time.time() 
         if 'stream' in data and data['stream'] == True: # use generate_responses to stream responses
             return Response(data_generator(response), mimetype='text/event-stream')
     except Exception as e:
@@ -48,6 +45,35 @@ def api_completion():
         end_time = time.time() 
         # raise e
     return response
+
+"""
+expects json data to have the following params:
+data = {
+    'litellm_request_id': 1234-8801-2222,
+    'feedback': 'good'
+}
+"""
+@app.route('/feedback', methods=["POST"])
+def store_feedback():
+    data = request.json
+    try:
+        # COMPLETION CALL
+        print(f"data: {data}")
+        litellm_request_id = data.get("litellm_request_id")
+        feedback = data.get("feedback")
+        # store_user_feedback 
+        
+
+    except Exception as e:
+        # call handle_error function
+        print(f"Got Error api_completion(): {traceback.format_exc()}")
+        ## LOG FAILURE
+        end_time = time.time() 
+        # raise e
+    return {
+        "status": "success"
+    }
+
 @app.route('/get_models', methods=["POST"])
 def get_models():
     try:
